@@ -1,22 +1,26 @@
 <template>
   <main class="container">
     <HomeHeader
-      :current-year="currentYear"
-      :total="totalCarbon"
-    />
-    <TransitionGroup
-      v-if="!!currentYearSortedCountries.length"
-      name="chart"
-      tag="div"
-      class="chart"
-    >
-      <HomeChartRow
-        v-for="country in currentYearSortedCountries"
-        :key="country.code"
-        :country="country"
-        :max-value="maxCarbonValuePerYear"
+        :current-year="currentYear"
+        :total="totalCarbon"
       />
-    </TransitionGroup>
+    <ErrorBoundary v-if="error" :message="error" />
+    <template v-else>
+      <TransitionGroup
+        v-if="!!currentYearSortedCountries.length"
+        name="chart"
+        tag="div"
+        class="chart"
+      >
+        <HomeChartRow
+          v-for="(country, index) in currentYearSortedCountries"
+          :key="`${country.code}-${index}`"
+          :country="country"
+          :max-value="maxCarbonValuePerYear"
+        />
+      </TransitionGroup>
+      <Loader v-if="isLoading" />
+    </template>
   </main>
 </template>
 
@@ -26,28 +30,36 @@
 
   import { getColorsRange } from '@/lib/utils/getColorsRange';
   import { useDataStore } from '@/stores/dataStore';
-  import type { CountryEmissionsForYear } from '@/typings/general';
+  import type { CountryEmissions } from '@/typings/general';
   import HomeHeader from '@/components/home/HomeHeader.vue';
   import HomeChartRow from '@/components/home/HomeChartRow.vue';
+  import Loader from '@/components/Loader.vue';
+  import ErrorBoundary from '@/components/ErrorBoundary.vue';
 
   type HomeState = {
     currentYear: number;
     minYear: number;
     maxYear: number;
-    emissionData: CountryEmissionsForYear[];
+    emissionData: CountryEmissions;
+    isLoading: boolean;
+    error: string;
+    getDataIntervalId: number;
   };
 
   export default defineComponent({
     name: 'home',
 
-    components: { HomeHeader, HomeChartRow },
+    components: { HomeHeader, HomeChartRow, Loader, ErrorBoundary },
 
     data(): HomeState {
       return {
         currentYear: 0,
         minYear: 0,
         maxYear: 0,
-        emissionData: [],
+        emissionData: { },
+        isLoading: true,
+        error: "",
+        getDataIntervalId: 0,
       };
     },
     computed: {
@@ -67,7 +79,6 @@
             color: colorSet[i],
             name: country.country,
             carbon: country.total,
-            code: country.countryCode,
           })) || []
         );
       },
@@ -93,8 +104,11 @@
     },
     async mounted() {
       this.getData();
+      
+      this.getDataIntervalId = setInterval(() => {
+        this.getData();
+      }, 2000);
 
-      // Note: set interval to show different values
       setInterval(() => {
         if (this.currentYear === this.maxYear) {
           this.currentYear = this.minYear;
@@ -111,18 +125,25 @@
 
       async getData() {
         try {
-          this.emissionData = await this.dataStore.getAllEmissionData();
+         const { emissionsPerCountry, isCompleted} = await this.dataStore.getAllEmissionData();
+          this.emissionData = emissionsPerCountry;
+          
+          if(isCompleted) {
+            clearInterval(this.getDataIntervalId);
+            this.isLoading = false;
+          }
 
           const years = Object.keys(this.emissionData);
-
           if (years.length) {
-            this.minYear = years[0];
-            this.maxYear = years[years.length - 1];
+            this.minYear = parseInt(years[0]);
+            this.maxYear = parseInt(years[years.length - 1]);
             this.currentYear = this.minYear;
           }
-        } catch (err) {
-          console.error(err);
+        } catch (err:any) {
+          console.log(err)
+          this.error = err.message;
         }
+       
       },
     },
   });

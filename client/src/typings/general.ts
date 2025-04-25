@@ -11,10 +11,12 @@ export type CountryEmissionsForYear = {
   total: number; // this represents the emissions for that year
 };
 
+export type CountryEmissions = {
+  [year: number]: CountryEmissionsForYear[];
+};
+
 export type Emissions = { 
-  data: {
-    [year: number]: CountryEmissionsForYear 
-  };
+  data:  { emissionsPerCountry: CountryEmissions, isCompleted: boolean };
   message: string;
 }
 
