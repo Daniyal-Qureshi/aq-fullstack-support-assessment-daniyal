@@ -14,7 +14,7 @@
       >
         <HomeChartRow
           v-for="(country, index) in currentYearSortedCountries"
-          :key="`${country.code}-${index}`"
+          :key="`${country.name}-${index}`"
           :country="country"
           :max-value="maxCarbonValuePerYear"
         />
@@ -43,7 +43,8 @@
     emissionData: CountryEmissions;
     isLoading: boolean;
     error: string;
-    getDataIntervalId: number;
+    getDataIntervalId?: NodeJS.Timeout;
+    cycleYearIntervalId?: NodeJS.Timeout;
   };
 
   export default defineComponent({
@@ -59,7 +60,6 @@
         emissionData: { },
         isLoading: true,
         error: "",
-        getDataIntervalId: 0,
       };
     },
     computed: {
@@ -102,6 +102,12 @@
         );
       },
     },
+
+    unmounted() {
+      clearInterval(this.getDataIntervalId);
+      clearInterval(this.cycleYearIntervalId);
+    },
+
     async mounted() {
       this.getData();
       
@@ -109,7 +115,9 @@
         this.getData();
       }, 2000);
 
-      setInterval(() => {
+      this.cycleYearIntervalId = setInterval(() => {
+        if(Object.keys(this.emissionData).length === 0) return;
+
         if (this.currentYear === this.maxYear) {
           this.currentYear = this.minYear;
         } else if (Object.keys(this.emissionData).length) {

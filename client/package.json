@@ -11,7 +11,10 @@
     "test": "vitest"
   },
   "dependencies": {
+    "@pinia/testing": "^1.0.1",
+    "@vue/test-utils": "^2.4.6",
     "axios": "^1.7.9",
+    "happy-dom": "^17.4.4",
     "pinia": "^2.3.0",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0"

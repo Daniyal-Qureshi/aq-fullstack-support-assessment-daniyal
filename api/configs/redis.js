@@ -1,7 +1,8 @@
 // src/config/redis.js
 import { createClient } from 'redis';
+import { REDIS_URL } from './vars';
 
-export const client = createClient({ url: 'redis://localhost:6379' });
+export const client = createClient({ url: REDIS_URL });
 
 async function connectRedis() {
   await client.connect();
