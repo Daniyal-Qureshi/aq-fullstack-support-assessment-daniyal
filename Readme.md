@@ -1,107 +1,32 @@
-# Altruistiq Fullstack Support Engineer hiring assessment
+#  Altruistiq Fullstack Support Engineer Assessment Submission (Daniyal Qureshi)
 
-Welcome to Altruistiq! Thank you very much for taking the time to do this task. 🙏
+This application visualizes animated emissions data across 269 countries over time.
 
-### Objective
+### Pull Request: https://github.com/Daniyal-Qureshi/aq-fullstack-support-assessment-daniyal/pull/1
 
-In this task you'll be debugging an application that consists of a backend and a frontend. 3 bugs have been reported that you need to fix.
+### Post-Mortem Report : https://github.com/Daniyal-Qureshi/aq-fullstack-support-assessment-daniyal/blob/0b8c46b148e1c9f54f468d003dcda6277f029ad4/postmortem.md
 
-**About this application**<br/>
-The application backend fetches emission data per year, per country from the [FootPrint Network Api](https://data.footprintnetwork.org/#/api). It transforms the data and exposes it via an api to the frontend.
-
-The frontend fetches the data, and renders an animated chart. It loops through the years, and for each year it shows a sorted chart with emission per country. That way the user can see for every year which country is the highest emitting country!
-
-The result is something like this but then for emissions:
-
-![https://miro.medium.com/max/1600/1*37uCN6y1WyLukxwCadhWRw.gif](https://miro.medium.com/max/1600/1*37uCN6y1WyLukxwCadhWRw.gif)
-
-**Time scope**<br/>
-We suggest to not spent more than 2 hours, but you're free to spend more time.
-
-**AI usage**<br/>
-We encourage you to _not use AI_; you should be showing of your skills and expertise, not an LLM's. Also in the support role that you're applying for, AI is only of limited use, and strong dependency on AI will stop you from being successful in this role.
-
-However if you choose to use AI we'd like you to be transparent about it and explain how you used it, for example sharing the prompts in the post-mortem, really showing how you use it as a tool to debug or fix cases.
-
-### Get Started
-
-### Install
-
-Clone this repo, then
+## 🚀 Quick Start
 
 ```bash
-cd api && npm i
-cd client && npm i
-```
+# 1. Clone repo
+git clone https://github.com/Daniyal-Qureshi/aq-fullstack-support-assessment-daniyal
+cd aq-fullstack-support-assessment-daniyal
 
-### Set env secret
+# 2. Install dependencies
+cd api && npm install
+cd ../client && npm install
 
-In the `api` folder rename `.env.example` to `.env` and paste the secret that you've received from us.
+# 3. Set up environment variables (copy api/.env.example to api/.env)
 
-### Run
+# 4. Start Redis (requires Redis installed)
+redis-server
 
-Code automatically reloads upon code changes.
-The backend runs on port 5010, the frontend runs on http://localhost:5173
-
-```bash
+# 5. Run both servers
 cd api && npm run dev
-cd client && npm run dev
+cd ../client && npm run dev
+
+#6. Run tests 
+cd api && npm run test
+cd ../client && npm run test
 ```
-
-### Run tests
-
-The client uses Vitest and the api uses Mocha. Code and tests are being watched so automatically reruns.
-
-```bash
-cd api && npm test
-cd client && npm test
-```
-
-# Tasks
-
-Please read through all the tasks to understand the full scope of this assessment.
-Make sure to work in a new branch so you can create a PR.
-
-## BUG REPORT 1: Chart is not always showing country emissions
-
-When loading the frontend, the chart does not always render. The behavior is very flaky, sometimes it renders and sometimes it does not.
-
-Reproduce:
-
-- Load the frontend via http://localhost:5173
-- Refresh the page until you find it doesn't show the chart
-
-Acceptance Criteria:
-
-- Fix when the user loads the frontend, the chart shows countries and their emissions _immediately_
-- Write unit test(s)
-- All tests, backend and frontend, should pass
-- Write a post mortem explaining what the root cause was and how you approached the fix
-
-## BUG REPORT 2: Chart is not showing all countries
-
-You have fixed showing the frontend, but now it seems the chart shows only 8-10 countries depending on the year (unless you fixed this already with bug 1). Make sure that all countries are shown.
-
-Acceptance Criteria:
-
-- A total of 269 countries and their emissions should be shown _immediately_ when loading the frontend in the browser
-- Write unit test(s)
-- All tests, backend and frontend, should pass
-- Write a post mortem explaining what the root cause was and how you approached the fix
-
-## BUG REPORT 3: Years are not looping
-
-The chart should loop through the years, so when it reaches the final year it should start again at the first year in the data set. But the years keep increasing and never loop back to the first year. This causes the chart to render blank as there is not data for year greater than 2025.
-
-Acceptance Criteria:
-
-- Should loop through years correctly
-- When last year in the dataset is rendered, should render the first year again
-- Write unit test
-- All tests, backend and frontend, should pass
-- Write a post mortem explaining what the root cause was and how you approached the fix
-
-# Deliver your result
-
-Please provide a git repository with your code and send us the url.
-Your code changes should be in its own branch, and a PR should be created so we can review the changes and run them easily it.
