@@ -7,14 +7,21 @@ import { prepareEmissionsByCountry } from "./seeds.controller";
  * @param {Object} res - Express response object
  * @param {Function} currentTimeProvider - Function to provide the current time (used for testing)
  */
-export const getEmissionsByCountry = async (req, res, currentTimeProvider = () => Date.now()) => {
+export const getEmissionsByCountry = async (req, res) => {
   try {    
     const emissionsPerCountry = await prepareEmissionsByCountry();
-    
-    return res.json({ data: emissionsPerCountry, message: "Emissions per country retrieved successfully!" });
+    return res.status(200).json({ data: emissionsPerCountry, message: "Emissions per country retrieved successfully!" });
   } catch (error) {
-    // Handle any errors that occur during the process
-    console.error('Error fetching emissions data:', error);
-    res.status(500).send('Internal Server Error');
+    console.log('Error fetching emissions data:', error);
+    if(error.status == 429) {
+        return res.status(429).json({
+            message: "Too Many Requests, please try again in a moment."
+         })
+    }
+    else {
+        return res.status(500).json({
+            message: "Internal Server Error"
+        });
+    }
   }
 };

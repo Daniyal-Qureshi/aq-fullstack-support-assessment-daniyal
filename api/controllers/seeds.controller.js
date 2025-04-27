@@ -1,6 +1,11 @@
-import footprintApi from './../helpers/footprint.helper';
-import { transformData, fetchData, sortByHighestTotal } from './../helpers/seeds.helper';
-import { SKIPPED_COUNTRIES } from './../configs/vars';
+import {
+  transformData,
+  sortByHighestTotal,
+  getPaginatedCountries,
+  getCountryPromises,
+} from "./../helpers/seeds.helper";
+import { REDIS_KEYS, SKIPPED_COUNTRIES } from "./../configs/vars";
+import { client } from "./../configs/redis.js";
 
 /**
  * Prepare emissions data by country.
@@ -10,36 +15,36 @@ import { SKIPPED_COUNTRIES } from './../configs/vars';
  * @returns {Promise<Object>} The emissions data organized by country.
  */
 export const prepareEmissionsByCountry = async () => {
-  const dataByCountry = {};
+  const  { countries, offset, totalCountriesCount } = await getPaginatedCountries();
 
-  // Fetch all countries data from the footprint API
-  const countries = await footprintApi.getCountries();
-
-  const promises = []
-
-  // Create a request for each country
-  for (const country of countries) {
-    const countryName = country.countryName.toLowerCase().trim();
-    
-    if (!SKIPPED_COUNTRIES.includes(countryName) && !dataByCountry[countryName]) {
-      promises.push(fetchData(country.countryCode));
-    }
-  }
-
+  const { promises, dataByCountry} = getCountryPromises(countries);
+  
   let results = await Promise.allSettled(promises);
 
-  results = results
-    .filter(result => result.status === 'fulfilled' && result.value.length)
-    .map(result => result.value);
+  const rejected = results.filter((result) => result.status === "rejected");
+  console.log("total rejected", rejected.length);
 
-  // Key by country name, transform and sort the data
-  results.forEach(r => {
-    const countryName = r[0].countryName.toLowerCase().trim()
+  const fulfilled = results.filter((result) => result.status === "fulfilled");
+
+  results = fulfilled
+    .filter((result) => result.value?.length)
+    .map((result) => result.value);
+
+  const isCompleted = fulfilled.length + 1 >=  totalCountriesCount; // SKIPPED 'ALL' COUNTRY CODE
+  console.log({ isCompleted });
+
+  results.forEach((r) => {
+    const countryName = r[0].countryName.toLowerCase().trim();
     dataByCountry[countryName] = r;
-  })
+  });
 
   let emissionsPerCountry = transformData(dataByCountry);
   emissionsPerCountry = await sortByHighestTotal(emissionsPerCountry);
 
-  return emissionsPerCountry;
+  await client.setEx(REDIS_KEYS.OFFSET, 86400, offset.toString());
+
+  return {
+    emissionsPerCountry,
+    isCompleted,
+  };
 };
