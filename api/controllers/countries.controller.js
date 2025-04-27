@@ -10,18 +10,16 @@ import { prepareEmissionsByCountry } from "./seeds.controller";
 export const getEmissionsByCountry = async (req, res) => {
   try {    
     const emissionsPerCountry = await prepareEmissionsByCountry();
-    return res.json({ data: emissionsPerCountry, message: "Emissions per country retrieved successfully!" });
+    return res.status(200).json({ data: emissionsPerCountry, message: "Emissions per country retrieved successfully!" });
   } catch (error) {
     console.log('Error fetching emissions data:', error);
     if(error.status == 429) {
         return res.status(429).json({
-            error,
             message: "Too Many Requests, please try again in a moment."
          })
     }
     else {
         return res.status(500).json({
-            error,
             message: "Internal Server Error"
         });
     }
