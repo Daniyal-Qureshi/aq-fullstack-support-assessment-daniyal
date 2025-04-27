@@ -14,7 +14,7 @@ git clone https://github.com/Daniyal-Qureshi/aq-fullstack-support-assessment-dan
 cd aq-fullstack-support-assessment-daniyal
 
 # 2. Install dependencies
-cd api && npm install
+cd api && npm install --legacy-peer-deps # pinia testing requires pinia >=3.0.2 
 cd ../client && npm install
 
 # 3. Set up environment variables (copy api/.env.example to api/.env)

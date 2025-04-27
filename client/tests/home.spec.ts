@@ -129,6 +129,7 @@ describe('Home.vue', () => {
   });
 
   it('shows ErrorBoundary when error occurs', async () => {
+    
     vi.spyOn(dataStore, 'getAllEmissionData').mockRejectedValue(
       new Error('MockError: This is intentional for testing Error Boundary ,Failed to fetch data from API')
     );
