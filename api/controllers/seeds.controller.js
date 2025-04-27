@@ -41,7 +41,6 @@ export const prepareEmissionsByCountry = async () => {
   let emissionsPerCountry = transformData(dataByCountry);
   emissionsPerCountry = await sortByHighestTotal(emissionsPerCountry);
 
-  console.log({ offset });
   await client.setEx(REDIS_KEYS.OFFSET, 86400, offset.toString());
 
   return {

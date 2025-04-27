@@ -8,9 +8,9 @@ export const ALLOWED_ORIGINS = [ //allowed origins to be added in the CORS
     'http://localhost:5173'
 ];
 export const REDIS_URL = process.env.REDIS_URL // Redis URL for connecting to Redis
-export const RATE_LIMITER_OPTIONS = { //limiting requests to add security
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
+export const RATE_LIMITER_OPTIONS = {
+  windowMs: 60 * 1000, // 1 minute
+  max: 100,             // Limit each IP to 30 requests per minute
 };
 
 export const SUCCESS_STATUS_CODE = 200
